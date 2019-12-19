@@ -1,0 +1,40 @@
+best <- function(state, outcome){
+  
+  data <- read.csv("outcome-of-care-measures.csv", colClasses = "character")
+  new_data <- as.data.frame(cbind(data[,2],data[,7],data[,11],data[,17],data[,23]), stringasFactors = FALSE)
+  colnames(new_data) <- c("Hospital", "State_list", "HeartAttack", "HeartFailure", "Pneumonia")
+  
+  if(!outcome %in% c("heart attack", "heart failure", "pneumonia")){
+    stop("Invalid Outcome")
+  }
+  else if(!state %in% new_data$State_list){
+    stop("Invalid State")
+  }
+  
+  new_data_with_state <- subset(new_data, State_list == state)
+  new_data_with_state[,1] <- as.character(new_data_with_state[,1])
+  new_data_with_state[,2] <- as.character(new_data_with_state[,2])
+  new_data_with_state[,3] <- as.numeric(as.character(new_data_with_state[,3]))
+  new_data_with_state[,4] <- as.numeric(as.character(new_data_with_state[,4]))
+  new_data_with_state[,5] <- as.numeric(as.character(new_data_with_state[,5]))
+  
+  #get the desired outcome column from the data file
+  if(outcome == "heart attack") {
+    final_data <- new_data_with_state[,c(1,2,3)]
+  }
+  else if(outcome == "heart failure") {
+    final_data <- new_data_with_state[,c(1,2,4)]
+  }
+  else {
+    final_data <- new_data_with_state[,c(1,2,5)]
+  }
+  
+  
+  min_val <- min(final_data[,3], na.rm = TRUE)
+  num_val <- which(final_data[,3] == min_val)
+  sorted_data <- sort(final_data$Hospital[num_val])
+  print(sorted_data[1])
+}
+
+best("AL", "heart failure")
+best("SC", "heart attack")
